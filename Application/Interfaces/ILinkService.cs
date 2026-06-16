@@ -13,4 +13,10 @@ public interface ILinkService
     Task<List<LinkResponse>> GetAllLinks();
 
     Task<List<LinkResponse>> GetLinksByUserId(long userId);
+
+    Task<LinkResponse> GetLinkById(long id);
+
+    Task DeleteLink(long id);
+
+    Task<StatsResponse> GetStats();
 }

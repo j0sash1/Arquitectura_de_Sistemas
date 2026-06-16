@@ -79,4 +79,33 @@ public sealed class LinkService : ILinkService
         _logger.LogInformation("Retrieved {Count} links for userId: {UserId}.", links.Count, userId);
         return links.Select(LinkResponse.From).ToList();
     }
+    public async Task<LinkResponse> GetLinkById(long id)
+    {
+        var link = await _linkRepository.GetByIdAsync(id);
+
+        if (link is null)
+            throw new KeyNotFoundException();
+
+        return LinkResponse.From(link);
+    }
+    public async Task DeleteLink(long id)
+    {
+        var link = await _linkRepository.GetByIdAsync(id);
+
+        if (link is null)
+            throw new KeyNotFoundException();
+
+        await _linkRepository.DeleteAsync(link);
+        await _linkRepository.SaveChangesAsync();
+    }
+    public async Task<StatsResponse> GetStats()
+    {
+        var links = await _linkRepository.GetAllAsync();
+
+        return new StatsResponse
+        {
+            TotalUrls = links.Count,
+            TotalClicks = links.Sum(x => x.Clicks)
+        };
+    }
 }

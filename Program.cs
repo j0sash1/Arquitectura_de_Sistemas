@@ -25,6 +25,12 @@ builder.Host.UseSerilog();
 // Registers Razor Pages services
 builder.Services.AddRazorPages();
 
+builder.Services.AddControllers(options =>
+{
+    options.ReturnHttpNotAcceptable = true;
+})
+.AddXmlSerializerFormatters();
+
 // Registers the OpenAPI document generator with version 3.1 and API metadata
 builder.Services.AddOpenApi(options =>
 {
@@ -98,6 +104,7 @@ app.UseAuthentication();
 
 // Enables authorization (must come after UseAuthentication)
 app.UseAuthorization();
+app.MapControllers();
 
 // Maps static assets with automatic versioning
 app.MapStaticAssets();
@@ -113,6 +120,7 @@ app.MapScalarApiReference();
 
 // Maps the redirect endpoint GET /{shortUrl} from Endpoints/UrlRedirectEndpoint.cs
 app.MapUrlRedirect();
+
 
 // Creates a scope for scoped services (e.g. AppDbContext)
 using (var scope = app.Services.CreateScope())
