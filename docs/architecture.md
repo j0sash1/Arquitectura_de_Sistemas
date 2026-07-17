@@ -143,6 +143,57 @@ Benefits:
 
 ---
 
+## 4. Data Ownership
+
+Each microservice owns its own data and is responsible for managing its persistence. This approach avoids direct database sharing between services, reduces coupling, and allows each service to evolve independently.
+
+### URL Service
+
+**Owns:**
+
+- URL records
+- Short URL identifiers
+- URL metadata
+
+The URL Service is the only service allowed to create, update, or delete shortened URLs.
+
+---
+
+### Identity Service
+
+**Owns:**
+
+- User accounts
+- Credentials
+- Authentication information
+
+No other service accesses or modifies user data directly. User-related information is obtained through service communication when necessary.
+
+---
+
+### Stats Service
+
+**Owns:**
+
+- Click counts
+- Usage statistics
+- Aggregated analytics
+
+Statistics are maintained independently from URL management to improve scalability and allow analytical workloads without affecting user-facing operations.
+
+---
+
+### Data Consistency
+
+The architecture combines synchronous and asynchronous communication depending on the type of data being exchanged.
+
+- Critical operations, such as URL creation and authentication, use synchronous REST communication to ensure immediate consistency.
+- Click statistics are updated asynchronously through RabbitMQ events. After a successful redirect, the Redirect Service publishes a `ClickRegistered` event, which is consumed by the Stats Service.
+
+This event-driven approach provides eventual consistency for analytics while keeping the redirection process fast and minimizing coupling between services.
+
+---
+
 ## 5. Scalability Considerations
 
 One of the primary motivations for adopting microservices is independent scalability.
